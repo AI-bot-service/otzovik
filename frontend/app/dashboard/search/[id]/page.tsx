@@ -31,7 +31,7 @@ export default function SearchDetailPage() {
   const { data: query, isLoading } = useQuery({
     queryKey: ["query", id],
     queryFn: () => searchApi.get(id).then((r) => r.data),
-    refetchInterval: (data) => (data?.status === "running" || data?.status === "pending" ? 5000 : false),
+    refetchInterval: (query) => (query.state.data?.status === "running" || query.state.data?.status === "pending" ? 5000 : false),
   });
 
   const handleDelete = async () => {
@@ -48,8 +48,8 @@ export default function SearchDetailPage() {
   const analyses: SiteCardData[] = (query?.analyses ?? [])
     .filter((a: SiteCardData) => !search || a.site.domain.includes(search.toLowerCase()))
     .sort((a: SiteCardData, b: SiteCardData) => {
-      const av = (a as Record<string, number>)[sort] ?? 0;
-      const bv = (b as Record<string, number>)[sort] ?? 0;
+      const av = (a as unknown as Record<string, number>)[sort] ?? 0;
+      const bv = (b as unknown as Record<string, number>)[sort] ?? 0;
       return bv - av;
     });
 

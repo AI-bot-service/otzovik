@@ -1,6 +1,6 @@
 import enum
 from datetime import datetime
-from sqlalchemy import String, Boolean, Enum, Text, Integer, Float, DateTime
+from sqlalchemy import String, Boolean, Enum, ForeignKey, Text, Integer, Float, DateTime
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TimestampMixin, new_uuid
@@ -41,8 +41,8 @@ class SiteAnalysis(Base, TimestampMixin):
     __tablename__ = "site_analyses"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
-    search_query_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
-    site_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    search_query_id: Mapped[str] = mapped_column(String(36), ForeignKey("search_queries.id"), nullable=False, index=True)
+    site_id: Mapped[str] = mapped_column(String(36), ForeignKey("sites.id"), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     positive_count: Mapped[int] = mapped_column(Integer, default=0)
     negative_count: Mapped[int] = mapped_column(Integer, default=0)
@@ -62,7 +62,7 @@ class ReviewSnippet(Base, TimestampMixin):
     __tablename__ = "review_snippets"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
-    site_analysis_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    site_analysis_id: Mapped[str] = mapped_column(String(36), ForeignKey("site_analyses.id"), nullable=False, index=True)
     author: Mapped[str | None] = mapped_column(String(255), nullable=True)
     text: Mapped[str] = mapped_column(Text, nullable=False)
     sentiment: Mapped[SentimentType] = mapped_column(Enum(SentimentType), default=SentimentType.NEUTRAL)

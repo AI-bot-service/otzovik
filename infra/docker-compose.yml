@@ -1,0 +1,123 @@
+services:
+  postgres:
+    image: postgres:15
+    env_file: ../.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - internal
+
+  searxng:
+    image: searxng/searxng:latest
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080
+      - SEARXNG_SECRET_KEY=${SEARXNG_SECRET_KEY}
+    restart: unless-stopped
+    networks:
+      - internal
+    depends_on:
+      - redis
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    env_file: ../.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      searxng:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - internal
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.otzovik-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.otzovik-api.entrypoints=websecure"
+      - "traefik.http.routers.otzovik-api.tls=true"
+      - "traefik.http.routers.otzovik-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.otzovik-api.loadbalancer.server.port=8000"
+      - "traefik.http.routers.otzovik-ws.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/v1/search`) && Headers(`Connection`, `Upgrade`)"
+      - "traefik.http.routers.otzovik-ws.entrypoints=websecure"
+      - "traefik.http.routers.otzovik-ws.tls=true"
+
+  celery-worker:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=4
+    env_file: ../.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - internal
+
+  celery-beat:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    command: celery -A app.workers.celery_app beat --loglevel=info --scheduler celery.beat:PersistentScheduler
+    env_file: ../.env
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - internal
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_API_URL=https://${DOMAIN}/api
+    restart: unless-stopped
+    networks:
+      - internal
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.otzovik-web.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.otzovik-web.entrypoints=websecure"
+      - "traefik.http.routers.otzovik-web.tls=true"
+      - "traefik.http.routers.otzovik-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.otzovik-web.loadbalancer.server.port=3000"
+      - "traefik.http.routers.otzovik-web.priority=1"
+      - "traefik.http.routers.otzovik-api.priority=10"
+
+networks:
+  internal:
+    driver: bridge
+  traefik_network:
+    external: true
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -1,0 +1,43 @@
+/* Дизайн-токены otzovik — единственный источник стилей */
+:root {
+  --color-bg-primary: #0A0A0B;
+  --color-bg-surface: #141416;
+  --color-bg-elevated: #1C1C1F;
+
+  --color-border: #26262A;
+  --color-border-subtle: #1C1C1F;
+
+  --color-text-primary: #FAFAFA;
+  --color-text-muted: #8A8A94;
+  --color-text-subtle: #52525B;
+
+  --color-accent: #D1FF3C;
+  --color-accent-hover: #BCEC2A;
+  --color-accent-muted: rgba(209, 255, 60, 0.15);
+
+  --color-positive: #4ADE80;
+  --color-negative: #F87171;
+  --color-neutral: #A3A3B2;
+
+  --color-status-pending: #8A8A94;
+  --color-status-running: #FBBF24;
+  --color-status-completed: #4ADE80;
+  --color-status-failed: #F87171;
+
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius-card: 12px;
+  --radius: 6px;
+  --radius-full: 9999px;
+
+  --shadow-card: 0 0 0 1px var(--color-border);
+  --shadow-card-hover: 0 0 0 1px #3F3F45, 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-accent-glow: 0 0 24px rgba(209,255,60,0.15);
+
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --easing: cubic-bezier(0.4, 0, 0.2, 1);
+}

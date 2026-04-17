@@ -1,0 +1,50 @@
+use_default_settings: true
+
+general:
+  debug: false
+  instance_name: "otzovik-search"
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "ru"
+  max_page: 5
+
+server:
+  secret_key: "${SEARXNG_SECRET_KEY}"
+  bind_address: "0.0.0.0:8080"
+  base_url: false
+  image_proxy: false
+
+ui:
+  static_use_hash: false
+
+outgoing:
+  request_timeout: 10.0
+  useragent_suffix: "otzovik-search-bot"
+
+engines:
+  - name: google
+    engine: google
+    language: ru
+    country: RU
+    weight: 2
+
+  - name: bing
+    engine: bing
+    language: ru
+    weight: 1
+
+  - name: duckduckgo
+    engine: duckduckgo
+    language: ru
+    weight: 1
+
+  - name: yandex
+    engine: yandex
+    language: ru
+    weight: 2
+
+result_proxy:
+  url: ""
+  key: ""

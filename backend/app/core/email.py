@@ -1,8 +1,7 @@
-import aiosmtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
+import resend
 from app.core.config import settings
+
+resend.api_key = settings.RESEND_API_KEY
 
 
 async def send_otp_email(to_email: str, otp: str, is_admin: bool = False) -> None:
@@ -23,18 +22,9 @@ async def send_otp_email(to_email: str, otp: str, is_admin: bool = False) -> Non
     </div>
     """
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = f"{otp} — код входа в otzovik"
-    msg["From"] = settings.SMTP_FROM
-    msg["To"] = to_email
-    msg.attach(MIMEText(html, "html"))
-
-    await aiosmtplib.send(
-        msg,
-        hostname=settings.SMTP_HOST,
-        port=settings.SMTP_PORT,
-        username=settings.SMTP_USER,
-        password=settings.SMTP_PASSWORD,
-        use_tls=False,
-        start_tls=settings.SMTP_TLS,
-    )
+    resend.Emails.send({
+        "from": settings.SMTP_FROM,
+        "to": [to_email],
+        "subject": f"{otp} — код входа в otzovik",
+        "html": html,
+    })

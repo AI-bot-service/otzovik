@@ -32,17 +32,14 @@ engines:
 
   - name: bing
     engine: bing
-    language: ru
     weight: 1
 
   - name: duckduckgo
     engine: duckduckgo
-    language: ru
     weight: 1
 
   - name: yandex
     engine: yandex
-    language: ru
     weight: 2
 
 result_proxy:

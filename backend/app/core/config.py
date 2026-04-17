@@ -16,12 +16,8 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS_ADMIN: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS_USER: int = 1
 
-    SMTP_HOST: str = "smtp.gmail.com"
-    SMTP_PORT: int = 587
-    SMTP_USER: str
-    SMTP_PASSWORD: str
+    RESEND_API_KEY: str
     SMTP_FROM: str
-    SMTP_TLS: bool = True
 
     ADMIN_EMAIL: str
 

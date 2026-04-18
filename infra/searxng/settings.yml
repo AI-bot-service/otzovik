@@ -9,6 +9,9 @@ search:
   autocomplete: ""
   default_lang: "ru"
   max_page: 5
+  formats:
+    - html
+    - json
 
 server:
   secret_key: "${SEARXNG_SECRET_KEY}"

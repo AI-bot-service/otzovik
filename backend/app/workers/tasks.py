@@ -10,8 +10,7 @@ def run_async(coro):
 @celery_app.task(bind=True, name="search.run_query")
 def run_search_query(self, query_id: str) -> dict:
     from app.db.session import async_session_factory
-    from app.models.search_query import SearchQuery, QueryStatus
-    from app.models.site import Site, SiteAnalysis, ReviewSnippet, SiteType
+    from app.models import SearchQuery, QueryStatus, Site, SiteAnalysis, SiteType
     from app.services.search_service import search_sites, profile_site, calculate_relevance_score
     from app.services.ai_service import analyze_reviews
     from sqlalchemy import select
